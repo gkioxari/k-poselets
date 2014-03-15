@@ -3,12 +3,12 @@
 ------------------------------------------------------------------------------------------
 
 (1)  Set up the list of images
-       imglist=setup_imglist(image_names,img_path);
+       imglist=setup_imglist(image_names, img_path);
        where, image_names : list of image names
         	     img_path: the path to the directory containing the images
 
  (2) Read annotations
-       annot=read_img_annotations(image_names,annot_dir);
+       annot=read_img_annotations(image_names, imglist, annot_path);
        where, image_names: list of image names
        	      annot_path: the path to the directory containing the annotations
 
@@ -20,7 +20,7 @@
        where, unit_dims: the desired aspect rations [h w], e.g. [96 64;64 64]
         	      K: numbers of parts
         	      NUM_CANDIDATES: number of candidate K-poselets
-        	      
+
 (2) [Visualization] browse_kposelets(annot,imglist,part,i);
       where, i: index into the candidates, i=1,...,NUM_CANDIDATES
       
