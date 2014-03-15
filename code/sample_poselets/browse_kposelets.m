@@ -14,6 +14,10 @@ while 1
     img_name = a.img_name{id};
     img = imread(imglist(strcmp(img_name,{imglist.id})).im);
     
+    if a.img_flipped(id)
+        img = img(:,end:-1:1,:);
+    end
+    
     figure(fig); clf;
     imshow(img); hold on;
     title(sprintf('Example %d / %d',i,poselets{1}(pid).size)); hold on;

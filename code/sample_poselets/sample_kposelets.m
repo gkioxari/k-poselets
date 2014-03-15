@@ -13,8 +13,8 @@ function part=sample_kposelets(a,imglist,unit_dims,K,N)
 
 %%
 num_candidates=N;
-num_poslist=40; % minimum examples for each poselet
-MIN_OVERLAP=0.5;
+num_poslist = 40; % minimum examples for each poselet
+MIN_OVERLAP = 0.5;
 MIN_NUM_KPS = 4;
 MAX_POSLIST = 200;
 
