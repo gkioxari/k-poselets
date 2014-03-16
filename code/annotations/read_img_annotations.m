@@ -43,7 +43,8 @@ end
 
 
 for i=1:length(img_names)
-    
+
+	if(rem(i-1,100)==0) fprintf('Doing %d/%d\n', i, numel(img_names)); end    
     % find the annotations
     img_name = img_names{i};
     kk = strfind(files_names,img_name);

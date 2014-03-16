@@ -3,6 +3,7 @@ function model=init_model(boxes, poselet_dims, K)
 %initialize model
 model.sbin=8;
 model.interval=10;
+model.hogsize=32;
 model.thresh=0;
 model.numparts=K;
 model.w=cell(model.numparts,1);

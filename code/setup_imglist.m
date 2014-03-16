@@ -12,9 +12,10 @@ function imglist=setup_imglist(image_names,img_path)
 
 for i=1:length(image_names)
     imglist(i).id = image_names{i};
-    imglist(i).im = [img_path '/' image_names{i} '.jpg'];
+    imglist(i).im = fullfile(img_path, [image_names{i} '.jpg']);
     img = imread(imglist(i).im);
     imglist(i).dims=[size(img,2) size(img,1)];
+	if(rem(i-1,100)==0) fprintf('Doing %d/%d\n', i, numel(image_names)); end
     clear img;
 end
 
