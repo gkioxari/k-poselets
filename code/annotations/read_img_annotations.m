@@ -105,7 +105,7 @@ annot2 = flip_annotations(annot,flip_kps,imglist);
 annot = struct_concat(annot,annot2);
 
 % -------------------------------------------------------------------------
-function annot = flip_annotations(annot,flip_kps,imglist)
+function annot_flipped = flip_annotations(annot,flip_kps,imglist)
 
 annot_flipped = annot;
 num = size(annot.coords,3);
@@ -123,7 +123,6 @@ for i=1:num
     annot_flipped.bounds(i,:)=bounds; clear bounds;
     annot_flipped.entry_id(i,:)=i+num;
 end
-
 
 
 % -------------------------------------------------------------------------
