@@ -191,6 +191,10 @@ hardfeats=hardfeats(:,1:count_hard);
 fprintf('*');
 save(fullfile(model_dir, 'final_model.mat'), 'model');
 diary off;
+%set kpid and name
+model.name=name;
+model.kpid=kpid;
+
 
 function model=update_model(model,wts)
 numparts=size(model.sizes,1);
