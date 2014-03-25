@@ -1,5 +1,4 @@
-function opts=get_default_training_opts
-basedir='../../data';
+function opts=get_default_training_opts(basedir)
 if(~exist(basedir, 'file'))
 	 error('Could not find: %s', fullfile(pwd,basedir));
 end

@@ -1,10 +1,10 @@
-function model = train_kposelet(part, annot, negimglist, imglist, name, kpid, ind_in_part, training_opts)
+function model = train_kposelet(part, annot, negimglist, imglist, name, kpid, ind_in_part, basedir, training_opts)
 %%
 
 rng(3);
 %if training opts are not supplied, initialize with default
 if(~exist('training_opts', 'var'))
-	training_opts=get_default_training_opts;
+	training_opts=get_default_training_opts(basedir);
 end
 
 %logging dirs
@@ -22,6 +22,11 @@ log_file=fullfile(log_dir, [sprintf('%05d',kpid) '.txt']);
 if(exist(fullfile(model_dir, 'final_model.mat'), 'file'))
 	x=load(fullfile(model_dir, 'final_model.mat'));
 	model=x.model;
+	model.name=name;
+	model.kpid=kpid;
+
+
+
 	return;
 end
 

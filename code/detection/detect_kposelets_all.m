@@ -61,7 +61,7 @@ detections.scales=scales;
 detections.scores=scores;
 detections.kpids=kpids;
 %set the dummy image id
-detections.imid=zeros(size(kpids));
+detections.imids=zeros(size(kpids));
 
 
 function boxes=prune_boxes_outside(boxes, numparts, imsize)
