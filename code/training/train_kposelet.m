@@ -1,10 +1,10 @@
-function model = train_kposelet(part, annot, negimglist, imglist, name, kpid, ind_in_part, training_opts)
+function model = train_kposelet(part, annot, negimglist, imglist, name, kpid, ind_in_part, basedir, training_opts)
 %%
 
 rng(3);
 %if training opts are not supplied, initialize with default
 if(~exist('training_opts', 'var'))
-	training_opts=get_default_training_opts;
+	training_opts=get_default_training_opts(basedir);
 end
 
 %logging dirs
@@ -22,6 +22,11 @@ log_file=fullfile(log_dir, [sprintf('%05d',kpid) '.txt']);
 if(exist(fullfile(model_dir, 'final_model.mat'), 'file'))
 	x=load(fullfile(model_dir, 'final_model.mat'));
 	model=x.model;
+	model.name=name;
+	model.kpid=kpid;
+
+
+
 	return;
 end
 
@@ -46,7 +51,7 @@ flips=false(numex, 1);
 poselet_dims=zeros(K,2);
 for i=1:K
 	p=part{i}(ind_in_part);
-	poselet_dims(i,:)=p.kpid;
+	poselet_dims(i,:)=p.dims;
 	for j=1:numex
 
 		%get the bounds
@@ -58,7 +63,8 @@ for i=1:K
 
 		%get the annotation
 		annot_id=find(annot.entry_id==p.dst_entry_ids(j));
-		imids(j)=find(strcmp({imglist.im},annot.img_name{annot_id})); 
+		imids(j)=find(strcmp({imglist.id},annot.img_name{annot_id})); 
+		flips(j)=annot.img_flipped(j);
 	end
 end
 
@@ -98,12 +104,12 @@ fprintf('*\n');
 
 %sample random negatives
 numneg=2000;
-numper=round(numneg/numel(negimids));
+numper=round(numneg/numel(negimglist));
 negfeats=[];
 fprintf('Sampling negative features\n');
-for k=1:numel(negimids)
-	imid=negimids(k);
-	img=imread(imglist(imid).im);
+for k=1:numel(negimglist)
+	imid=k;
+	img=imread(negimglist(imid).im);
 	[pyr, img2f, f2img]=featpyramid_plus(img, model);
 	negboxes=sample_negatives(pyr, img2f, f2img, model, numper);
 	if(isempty(negboxes)) continue; end
@@ -143,15 +149,16 @@ count_hard=0;
 num_svm_calls=0;
 for k=1:num_rounds
 	fprintf('Bootstrapping round:%d\n', k);
-	for l=1:numel(negimids)
+	for l=1:numel(negimglist)
 		fprintf('Doing :%d\n',l);
 		
 		%detect on negative image
-		img=imread(imglist(negimids(l)).im);
+		img=imread(negimglist(l).im);
 		[pyr, img2f, f2img]=featpyramid_plus(img, model);
 		boxes=run_kposelet_tree_dt(pyr, img2f, f2img, model, model.thresh+svm_thresh);
 		if(isempty(boxes)) continue; end
-		
+		fprintf('Found %d boxes\n', size(boxes,1));		
+
 		%get feats corresponding to the detection
 		[hogfeats, deffeats]=box2features_pyr_tree(boxes, pyr, img2f, model);
 		f=[hogfeats; deffeats];
@@ -160,11 +167,11 @@ for k=1:num_rounds
 		%if enough, bootstrap
 		if(count_hard>=max_untrained)
 			hardfeats=hardfeats(:,1:count_hard);
-			fprintf('*');
+			fprintf('Retraining\n');
 			feats=[posfeats negfeats hardfeats];
 			labels=[ones(size(posfeats,2),1); -ones(size(negfeats,2)+size(hardfeats,2),1)];
             
-	        [w, bias] = svm_solver_train_ub(labels, feats, opts.c,ub_constr,weights');
+	        [w, bias] = svm_solver_train_ub(labels, feats, training_opts.c,ub_constr,weights');
 	        m1.w = w';
 	        m1.w(end+1)=bias;
 	        model=update_model(model,m1.w);
@@ -189,6 +196,10 @@ hardfeats=hardfeats(:,1:count_hard);
 fprintf('*');
 save(fullfile(model_dir, 'final_model.mat'), 'model');
 diary off;
+%set kpid and name
+model.name=name;
+model.kpid=kpid;
+
 
 function model=update_model(model,wts)
 numparts=size(model.sizes,1);

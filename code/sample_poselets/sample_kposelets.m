@@ -29,7 +29,7 @@ rng('shuffle');
 for k=1:K
     part{k} = poselet(0,0,0);
 end
-while length(part{1})<num_candidates
+while length(part{1})<num_candidates+1
     
     % pick a random annotation
     annot_id = ceil(rand*annot_size);

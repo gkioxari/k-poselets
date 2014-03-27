@@ -23,4 +23,20 @@
 
 (2) [Visualization] browse_kposelets(annot,imglist,part,i);
       where, i: index into the candidates, i=1,...,NUM_CANDIDATES
-      
+
+
+------------------------------------------------------------------------------------------
+        TRAINING EACH POSELET
+------------------------------------------------------------------------------------------
+
+(1) model = train_kposelet(part, annot, negimglist, imglist, name, kpid, index_in_part);
+    part, annot, imglist are the same as above.
+    negimglist is a list of negative images. 
+    name serves as an identifier for a *set* of kposelets. For instance if you are training
+    kposelets on PASCAL you can name it "PASCAL"
+    kpid serves as an identifier for a particular kposelet in the set. During detection, the
+    output will record the kpid for each detection.
+    index_in_part is the index in part of the kposelet you want to train.
+
+
+    
