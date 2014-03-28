@@ -19,7 +19,7 @@ while 1
     end
     
     figure(fig); clf;
-    imshow(img); hold on;
+    imshow(img); hold on; 
     title(sprintf('Example %d / %d',i,poselets{1}(pid).size)); hold on;
     
     for k=1:K
