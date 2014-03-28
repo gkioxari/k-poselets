@@ -105,11 +105,12 @@ for n=first_el:last_el
     final_std(:,:,n-first_el+1) = nanstd(pred_kps,0,3);
     
 end
+
 for n=first_el:last_el
     output(n-first_el+1).kps_mean = kps_mean(:,:,:,n-first_el+1);
     output(n-first_el+1).kps_weights = kps_weights(:,:,n-first_el+1);
     output(n-first_el+1).mean = final_mean(:,:,n-first_el+1);
-    output(n-first_el+1).std = findal_std(:,:,n-first_el+1);
+    output(n-first_el+1).std = final_std(:,:,n-first_el+1);
     output(n-first_el+1).num_parts = K;
     output(n-first_el+1).kpid = n;
 end
