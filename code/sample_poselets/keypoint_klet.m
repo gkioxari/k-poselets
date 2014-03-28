@@ -4,9 +4,9 @@ function output=keypoint_klet(a,poslist,first_el,last_el)
 % a         : annot structure
 % poslist   : Kx1 cell array of the poslist for each part k=1...K
 %% OUTPUT
-% output    : struct of kps_mean [Kpx2xKxN array of the mean relative location 
+% output    : Nx1 struct of kps_mean [Kpx2xK array of the mean relative location 
 %             of Kp keypoints for each of the K parts of each of the N klets] 
-%             and kps_weights [NxKp]
+%             and kps_weights [KpxK]
 
 %%
 K = numel(poslist); % # of parts
@@ -20,7 +20,6 @@ end
 %% compute mean
 disp('Compute mean...');
 kps_mean = nan(Kp,2,K,last_el-first_el+1);
-kps_std = nan(Kp,2,K,last_el-first_el+1);
 
 for n=first_el:last_el
     fprintf('In %d\n',n);
@@ -106,8 +105,13 @@ for n=first_el:last_el
     final_std(:,:,n-first_el+1) = nanstd(pred_kps,0,3);
     
 end
-output.kps_mean = kps_mean;
-output.kps_weights = kps_weights;
-output.mean = final_mean;
-output.std = final_std;
+for n=first_el:last_el
+    output(n-first_el+1).kps_mean = kps_mean(:,:,:,n-first_el+1);
+    output(n-first_el+1).kps_weights = kps_weights(:,:,n-first_el+1);
+    output(n-first_el+1).mean = final_mean(:,:,n-first_el+1);
+    output(n-first_el+1).std = findal_std(:,:,n-first_el+1);
+    output(n-first_el+1).num_parts = K;
+    output(n-first_el+1).kpid = n;
+end
+
 end
