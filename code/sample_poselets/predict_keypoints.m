@@ -5,16 +5,21 @@ function coords = predict_keypoints(boxes,kps)
 %%
 Kp = size(kps.kps_mean,1); % # of keypoints
 K = kps.num_parts;         % # of parts
+N = size(boxes,1);         % # of activations
 
-bb=boxes(1:4*K);
-bb = reshape(bb,[4 K])';
-ctr = (bb(:,1:2)+bb(:,3:4))/2;
-width = bb(:,3)-bb(:,1);
-coords = zeros(Kp,2);
+ttx=zeros(Kp,N);
+tty=zeros(Kp,N);
+
 for k=1:K
-    temp_coords = kps.kps_mean(:,:,k)*width(k);
-    temp_coords = bsxfun(@plus,temp_coords,ctr(k,:));
-    coords=coords+bsxfun(@times,temp_coords,kps.kps_weights(:,k));
+    ctr=(boxes(:,(k-1)*4+1:(k-1)*4+2)+boxes(:,(k-1)*4+3:k*4))/2;
+    width=boxes(:,(k-1)*4+3)-boxes(:,(k-1)*4+1);
+    kpmeanx=kps.kps_mean(:,1,k);
+    kpmeany=kps.kps_mean(:,2,k);
+    ttx=ttx+bsxfun(@times,kps.kps_weights(:,k),bsxfun(@plus,kpmeanx*width',ctr(:,1)'));
+    tty=tty+bsxfun(@times,kps.kps_weights(:,k),bsxfun(@plus,kpmeany*width',ctr(:,2)'));
 end
+
+coords = cat(3,ttx,tty);
+coords = permute(coords,[1 3 2]);
 
 end
