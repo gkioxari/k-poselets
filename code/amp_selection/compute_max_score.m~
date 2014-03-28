@@ -1,0 +1,14 @@
+function max_score=compute_max_score(boxes,index,first_el,last_el)
+
+Nannots = max(index);
+Nkpids = max(detections.kpids);
+max_score = -inf(Nannots,P);
+for i=first_el:last_el
+    fprintf('[%d]',i);
+    keep_i = index==i;
+    for p=1:P
+        keep = keep_i & boxes(:,end-1)==p;
+        if sum(keep)==0, continue; end
+        max_score(i,p) = max(boxes(keep,end-2));
+    end
+end

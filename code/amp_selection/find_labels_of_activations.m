@@ -1,65 +1,76 @@
-function [labels index]= find_labels_of_activations(a,imglist,boxes,kps)
+function [labels index]= find_labels_of_activations...
+    (a, imglist, detections, kps_models, target_kps, iou_thresh)
 %% FIND_LABELS_OF_ACTIVATIONS() returns the labels and index in the 
 %% ground truth of the poselet activations
 %% INPUT
-% a         : annotations
-% imglist   : list of images
-% boxes     : activations of poselets
-% kps       : keypoint model for poselets
+% a             : annotations
+% imglist       : list of images
+% detections    : struct of N activations of poselets
+% kps_models    : keypoint model for poselets
+% target_kps    : index of keypoints to be considered for labeling
+%               activations
+% iou_thresh    : threshold for IOU
+%% OUTPUT
+% labels        : Nx1 vector of true/false
+% index         : Nx1 vector of indices to a
 
-a = struct_select(a,~a.img_flipped);
-Kp = size(kps.kps_mean,1);
-iou_thresh = 0.5;
+%%
+a  = struct_select(a,~a.img_flipped);
+N  = size(detections.boxes,1); % # of activations
+Nkpids = max(detections.kpids);% # of poselets
 
-torso_ks = [1 4 7 10];
-
-tt = a.coords(torso_ks,1:2,:);
+tt = a.coords(target_kps,1:2,:);
 gt_bounds = [min(tt,[],1) max(tt,[],1)-min(tt,[],1)]; clear tt;
 gt_bounds = permute(gt_bounds,[3 2 1]);
-image_ids = a.image_id(:);
+image_names = a.img_name;
 valid = find(~isnan(gt_bounds(:,1)));
 gt_bounds = gt_bounds(valid,:);
-image_ids = image_ids(valid);
+image_names = image_names(valid);
+[dummy gt_imids] = ismember(image_names,{imglist.id});
 
-labels=false(size(boxes,1),1);
-index=zeros(size(boxes,1),1);
 
-for i=1:size(boxes,1)
+labels = false(N,1);
+index  = zeros(N,1);
+pred_bounds = nan(N,4);
+
+fprintf('Doing kid ');
+for kid=1:Nkpids
+    fprintf('[%d]',kid);
+    % activations of kid
+    keep = detections.kpids==kid;   
+    boxes = detections.boxes(keep,:);
     
-    if mod(i,10000)==1
-        fprintf('In %d / %d \n',i,size(boxes,1))
-    end
-    
-    imid = boxes(i,end);
-    image_id = imglist(imid).image_id;
-    kid = boxes(i,end-1);
-    keep = find(image_ids==image_id);
-    if isempty(keep), error('Hmm?'); end
-    
-    K = kps.num_parts(kid);
-    bb=boxes(i,1:4*K);
-    bb = reshape(bb,[4 K])';
-    ctr = (bb(:,1:2)+bb(:,3:4))/2;
-    width = bb(:,3)-bb(:,1);
-    tt = zeros(Kp,2);
-    for k=1:K
-        temp_coords = kps.kps_mean(:,:,k,kid)*width(k);
-        temp_coords = bsxfun(@plus,temp_coords,ctr(k,:));
-        tt=tt+bsxfun(@times,temp_coords,kps.kps_weights(:,k,kid));
-    end
-    tt = tt(torso_ks,:);
-    bound = [min(tt,[],1) max(tt,[],1)-min(tt,[],1)];
-    iou = inters_union(gt_bounds(keep,:),bound);
-    
-    if any(iou>=iou_thresh)
-        [m mi] = max(iou);
-        labels(i)=true;
-        index(i)=valid(keep(mi));
-    end
+    % get keypoint predictions
+    coords = predict_keypoints(boxes,kps_models(kid));
+    ttx = coords(:,1,:); ttx = permute(ttx,[1 3 2]); 
+    tty = coords(:,2,:); tty = permute(tty,[1 3 2]);
+    ttx=ttx(target_kps,:);
+	tty=tty(target_kps,:);
+	minx=min(ttx,[],1);
+	maxx=max(ttx,[],1);
+	miny=min(tty,[],1);
+	maxy=max(tty,[],1);
+    pred_bounds(keep,:) = [minx(:) miny(:) maxx(:)-minx(:) maxy(:)-miny(:)];
     
 end
 
+fprintf('\n Doing imid\n')
+for imid = unique(detections.imids)'
+    
+    gt_keep = find(gt_imids==imid);
+    keep = find(detections.imids==imid);
+    
+    gt_bb = gt_bounds(gt_keep,:);
+    bb = pred_bounds(keep,:);
+    
+    iou = inters_union(bb,gt_bb);
+    [miou mi] = max(iou,[],2);
+    
+    labels(keep(miou>=iou_thresh)) = true;
+    index(keep(miou>=iou_thresh))  = valid(gt_keep(mi(miou>=iou_thresh)));
+    
 end
+
 
 function iou = inters_union(bounds1,bounds2)
 
@@ -70,4 +81,3 @@ union = bsxfun(@plus,ar1,ar2')-inters;
 
 iou = inters./(union+0.001);
 
-end

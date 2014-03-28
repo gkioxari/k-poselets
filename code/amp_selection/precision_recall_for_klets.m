@@ -1,17 +1,27 @@
-function data=precision_recall_for_klets(boxes,labels)
+function pr = precision_recall_for_klets(detections,labels)
+%% PRECISION_RECALL_FOR_KLETS() returns precision recall curves for each 
+%% kposelet
+%% INPUT
+% detections    : activations of kposelets
+% labels        : true/false labels of activations
+%% OUTPUT
+% pr            : ap-rec-prec-scores for each kposelet
 
+%%
+Nkpids = max(detections.kpids);
 
-for kid=1:max(boxes(:,end-1))
-    fprintf('Klet %d \n',kid);
-    keep = boxes(:,end-1)==kid;
+fprintf('Doing kid ');
+for kid=1:Nkpids
+    fprintf('[%d]',kid);
+    keep = detections.kpids==kid;
     lbls = labels(keep);
-    scores = boxes(keep,end-2);
+    scrs = detections.scores(keep);
     
-    [ap,rec,prec,scores] = get_precision_recall(scores,lbls,'max',[]);
-    data(kid).ap = ap;
-    data(kid).rec = rec;
-    data(kid).prec = prec;
-    data(kid).scores = scores;
+    [ap,rec,prec,scores] = get_precision_recall(scrs,lbls,'max',[]);
+    pr(kid).ap = ap;
+    pr(kid).rec = rec;
+    pr(kid).prec = prec;
+    pr(kid).scores = scores;
     
 end
 
