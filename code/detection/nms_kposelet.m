@@ -24,12 +24,15 @@ while(~isempty(i1))
 	int=zeros(1, numel(i1), numparts);
 	uni=zeros(1, numel(i1), numparts);
 	for i=1:numparts
-		int(:,:,i)=rectint(bx,boxes2(i1,:));
+		int(:,:,i)=rectint(bx((i-1)*4+(1:4)),boxes2(i1,(i-1)*4+(1:4)));
 		uni(:,:,i)=bareas(i1,i)' + bareas(pick,i)-int(:,:,i);
 	end
 	ov=int./uni; 
 
-	remove=mean(ov,3)>thresh;	
+	remove=find(mean(ov,3)>thresh);
+	%ismember(104,i1)
+    %ov(1,find(i1==104),:)
+	%pause;
 	i1(remove)=[];
 end
 boxes=boxes(I,:);

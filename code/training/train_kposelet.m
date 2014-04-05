@@ -64,7 +64,7 @@ for i=1:K
 		%get the annotation
 		annot_id=find(annot.entry_id==p.dst_entry_ids(j));
 		imids(j)=find(strcmp({imglist.id},annot.img_name{annot_id})); 
-		flips(j)=annot.img_flipped(j);
+		flips(j)=annot.img_flipped(annot_id);
 	end
 end
 
