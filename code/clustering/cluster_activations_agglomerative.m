@@ -13,31 +13,65 @@ function clusters = cluster_activations_agglomerative...
 %                members is a Nx1 vector of indices in detections
 %                imid is a scalar, unique for a given image 
 
+%%
+% Get torso bounds for detections
+N = size(detections.boxes,1);
+pred_bounds = nan(N,4);
+pred_scores = nan(N,1);
+fprintf('Doing kid ');
+for kid = unique(detections.kpids')
+    fprintf('[%d]',kid);
+    % activations of kid
+    keep = detections.kpids==kid;   
+    boxes = detections.boxes(keep,:);
+    
+    % get keypoint predictions
+    coords = predict_keypoints(boxes,kps_models(kid));
+    ttx = coords(:,1,:); ttx = permute(ttx,[1 3 2]); 
+    tty = coords(:,2,:); tty = permute(tty,[1 3 2]);
+    ttx=ttx(target_kps,:);
+	tty=tty(target_kps,:);
+	minx=min(ttx,[],1);
+	maxx=max(ttx,[],1);
+	miny=min(tty,[],1);
+	maxy=max(tty,[],1);
+    pred_bounds(keep,:) = [minx(:) miny(:) maxx(:)-minx(:) maxy(:)-miny(:)];
+
+    scr = detections.scores(keep);
+    if length(pr(kid).scores)>10000
+        step = floor(length(pr(kid).scores)/10000);
+        pr(kid).scores = pr(kid).scores(1:step:length(pr(kid).scores));
+        pr(kid).prec   = pr(kid).prec(1:step:length(pr(kid).prec));
+    end
+    for j=1:length(scr)
+        ind = find(scr(j)>=pr(kid).scores);
+        if isempty(ind)
+            scr(j) = pr(kid).prec(end);
+        else 
+            ind = [ind(1) ind(1)-1 ind(1)+1];
+            ind = ind(ind>=1 & ind<=length(pr(kid).scores));
+            [m mi] = min(abs(pr(kid).scores(ind)-scr(j)));
+            scr(j) = pr(kid).prec(ind(mi));
+        end
+    end
+    pred_scores(keep) = scr;
+    clear keep m mi scr minx miny maxx maxy ttx tty coords boxes;
+end
+
 ci=0;
 imids = unique(detections.imids)';
 
-for imid=image_ids
+for imid=imids
     
-    keep = find(detections.imid==imid);
+    keep = find(detections.imids==imid);
     N = length(keep);
     if N==0, continue; end
 
     fprintf('Imid %d\n',imid);
     fprintf('...Getting torso bounds\n');
-    torso_bounds = nan(N,4);
-    scores = nan(N,1);
-    for i=1:N
-        kid = detections.kpids(keep(i));
-        box = detections.boxes(keep(i),:);
-        scr = detections.scores(keep(i));
-        coords = predict_keypoints(box,kps_models(kid));
-        cc = coords(target_kps,:);
-        torso_bounds(i,:) = [min(cc,[],1) max(cc,[],1)-min(cc,[],1)];
-        clear cc coords box;
-        
-        [m mi] = min(abs(pr(kid).scores-scr));
-        scores(i) = pr(kid).prec(mi);
-    end
+    torso_bounds = pred_bounds(keep,:);
+    scores = pred_scores(keep);
+    
     
     fprintf('...Computing IOU\n');
     iou = inters_union(torso_bounds,torso_bounds);

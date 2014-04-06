@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
-			DATA INITIALIZATION
+			               DATA INITIALIZATION
 ------------------------------------------------------------------------------------------
 
 (1)  Set up the list of images
@@ -13,7 +13,7 @@
        	      annot_path: the path to the directory containing the annotations
 
 ------------------------------------------------------------------------------------------
-		CONSTRUCTION OF POSLISTS
+		                CONSTRUCTION OF POSLISTS
 ------------------------------------------------------------------------------------------
 
 (1) part=sample_kposelets(annot,imglist,unit_dims,K,NUM_CANDIDATES);
@@ -26,7 +26,7 @@
 
 
 ------------------------------------------------------------------------------------------
-        TRAINING EACH POSELET
+                                  TRAINING EACH POSELET
 ------------------------------------------------------------------------------------------
 
 (1) model = train_kposelet(part, annot, negimglist, imglist, name, kpid, index_in_part);
@@ -38,5 +38,13 @@
     output will record the kpid for each detection.
     index_in_part is the index in part of the kposelet you want to train.
 
+--------------------------------------------------------------------------------------------
+                                  KEYPOINT MODELS
+--------------------------------------------------------------------------------------------
 
-    
+(1)  kps_models = keypoint_klet(annot,part)
+        where kps_models contains the keypoint model for each poselet
+
+(2) coords = predict_keypoints(box, kps_model)
+
+
