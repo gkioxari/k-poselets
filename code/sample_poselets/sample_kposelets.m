@@ -21,10 +21,10 @@ MAX_POSLIST = 200;
 all_bounds = a.bounds;
 annot_size = size(a.coords,3);
 
-%rng('shuffle');
- [status seed] = system('od /dev/urandom --read-bytes=4 -tu | awk ''{print $2}''');
- seed=str2double(seed);
- rng(seed);
+rng('shuffle');
+%  [status seed] = system('od /dev/urandom --read-bytes=4 -tu | awk ''{print $2}''');
+%  seed=str2double(seed);
+%  rng(seed);
 
 for k=1:K
     part{k} = poselet(0,0,0);
