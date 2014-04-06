@@ -15,7 +15,7 @@ function [labels index]= find_labels_of_activations...
 % index         : Nx1 vector of indices to a
 
 %%
-a  = struct_select(a,~a.img_flipped);
+a  = select_annotations(a,~a.img_flipped);
 N  = size(detections.boxes,1); % # of activations
 Nkpids = max(detections.kpids);% # of poselets
 
