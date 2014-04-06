@@ -108,7 +108,7 @@ while length(part{1})<num_candidates+1
         
     % for each of the K parts, find similar examples (poselet construction)
     for k=1:K
-        a_sel = struct_select(a,annot_id);
+        a_sel = select_annotations(a,annot_id);
         new_part(k) = create_poselet_examples(pick_unit_dims(k,:),a_sel,[ctr(k,:) dims(k,:) 0], a, imglist, true);
         new_part(k).src_bounds = bounds(k,:);
     end
