@@ -34,6 +34,7 @@ annot.img_flipped = false(zeros,1);
 annot.img_name = cell(num,1);
 annot.voc_id = uint8(zeros(num,1));
 annot.entry_id = uint16(zeros(num,1));
+annot.kps_labels = kps;
 
 img_names = unique(img_names);
 files = dir(annot_path);
