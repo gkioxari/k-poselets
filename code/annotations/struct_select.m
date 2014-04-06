@@ -1,24 +1,23 @@
-function a=struct_select(a,sel)
+function sout = struct_select(s,sel)
 
-if ~isstruct(a)
-    error('Input 1 has to be a struct');
-end
+names = fieldnames(s);
+sout = struct;
 
-fields = fieldnames(a);
-for i=1:numel(fields)
-    value = getfield(a, fields{i});
-    if strcmp(fields{i},'coords')
-        value = value(:,:,sel);
-    elseif strcmp(fields{i},'visible')
-        value = value(:,sel);
-    elseif strcmp(fields{i},'bounds')
-        value = value(sel,:);
-    elseif strcmp(fields{i},'img_size')
-        value = value(sel,:);
+for i=1:length(names)
+    v = getfield(s,names{i});
+    if strcmp(names{i},'bounds')
+        v = v(sel,:);
+    elseif strcmp(names{i},'coords')
+        v = v(:,:,sel);
+    elseif strcmp(names{i},'visible')
+        v = v(:,sel);
+    elseif strcmp(names{i},'kps_labels') || strcmp(names{i},'class');
+        v = v;
     else
-        value = value(sel);
+        v = v(sel,:);
     end
-    a = setfield(a,fields{i},value);
+    
+    sout = setfield(sout,names{i},v);
 end
 
 end
