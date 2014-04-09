@@ -105,6 +105,9 @@ end
 annot2 = flip_annotations(annot,flip_kps,imglist);
 annot = struct_concat(annot,annot2);
 
+annot.kps_labels = kps;
+
+
 % -------------------------------------------------------------------------
 function annot_flipped = flip_annotations(annot,flip_kps,imglist)
 
