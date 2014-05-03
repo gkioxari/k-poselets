@@ -1,10 +1,13 @@
-function [svmmodel, feats, labels, fmax] = train_stage2_rescorer_torso(trimids, clusters, bounds, detections, precrec_mapping, a, imglist, selected, clusters_neg, detections_neg, imglist_neg)
+function [svmmodel, feats, labels, fmax] = train_stage2_rescorer_torso(trimids, clusters, bounds, detections, precrec_mapping, a, imglist, selected, newscores,clusters_neg, detections_neg, imglist_neg)
 %restrict attention to clusters in training list
 bounds=bounds(ismember([clusters.imid], trimids),:);
 clusters=clusters(ismember([clusters.imid], trimids));
 
-%get the mapped scores
-newscores = map_scores_using_precrec(detections.scores, detections.kpids, precrec_mapping);
+if(~exist('newscores', 'var'))
+	%get the mapped scores
+	newscores = map_scores_using_precrec(detections.scores, detections.kpids, precrec_mapping);
+
+end
 
 %get the leader
 leaders=get_cluster_leader(clusters, newscores);
