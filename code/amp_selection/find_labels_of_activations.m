@@ -35,7 +35,9 @@ pred_bounds = nan(N,4);
 
 fprintf('Doing kid ');
 for kid=1:Nkpids
-    fprintf('[%d]',kid);
+	if(rem(kid,10)==0)
+    	fprintf('[%d]',kid);
+	end
     % activations of kid
     keep = detections.kpids==kid;   
     boxes = detections.boxes(keep,:);

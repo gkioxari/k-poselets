@@ -1,6 +1,19 @@
-function [model, centroids, svmmodel, feats, labels, fmax]=train_stage2_detection_top(trimids, clusters, detections, kps, precrec_mapping,precrec_mapping_bbox, imglist,a, bbox_pred, selected)
+function stage2model=train_stage2_detection_top_withbbox(trimids, clusters, detections,...
+							 kps, precrec_mapping,precrec_mapping_bbox, imglist,a, bbox_pred, selected)
+%function stage2model=train_stage2_detection_top_withbbox(trimids, clusters, detections,...
+%							 kps, precrec_mapping,precrec_mapping_bbox, imglist,a, bbox_pred, selected)
+%trains the second stage. Input arguments:
+%trimids				: indices of training images. These are indices into imglist
+%clusters				: clusters of detections
+%kps					: keypoint models
+%precrec_mapping		: precision recall mapping computed from torsos
+%precrec_mapping_bbox	: precision recall mapping computed from bounding box
+%imglist				: list of images.
+%a						: annot structure
+%bbox_pred				: bounding box models (see bbox_klet.m)
+%selected				: list of selected k-poselet ids
 rng('default');
-rng(1);
+rng(3);
 %get the mapped scores
 
 fprintf('Computing mapped scores..\n');
@@ -43,6 +56,9 @@ model=liblinear_train(labels, feats, '-s 0 -c 0.1 -B 1', 'col');
 [ypred, acc, dec]=predict(labels, feats, model,'-b 1', 'col');
 acc
 
+%svmmodel=[];
+%fmax=[];
+%return;
 
 fprintf('Getting bbox predictions on training data..\n');
 pred_bounds=predict_all_bboxes(torsos, pred_bounds, [clusters.imid], imglist, model, centroids);
@@ -73,7 +89,9 @@ fprintf('Training\n');
 svmmodel=liblinear_train(labels, feats, '-s 3 -c 0.05 -w1 3 -B 1', 'col');
 svmmodel.w(1:end-1)=svmmodel.w(1:end-1)./fmax';
 
-
+stage2model.bboxmodel=model;
+stage2model.bboxcentroids=centroids;
+stage2model.rescoremodel=svmmodel;
 
 
 

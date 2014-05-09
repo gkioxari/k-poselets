@@ -12,7 +12,9 @@ Nkpids = max(detections.kpids);
 
 fprintf('Doing kid ');
 for kid=1:Nkpids
-    fprintf('[%d]',kid);
+	if(rem(kid,10)==0)
+    	fprintf('[%d]',kid);
+	end
     keep = detections.kpids==kid;
     lbls = labels(keep);
     scrs = detections.scores(keep);

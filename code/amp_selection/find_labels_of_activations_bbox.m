@@ -1,4 +1,4 @@
-function [labels index]= find_labels_of_activations...
+function [labels index]= find_labels_of_activations_bbox...
     (a, imglist, detections, kps_models, iou_thresh)
 %% FIND_LABELS_OF_ACTIVATIONS() returns the labels and index in the 
 %% ground truth of the poselet activations
@@ -6,9 +6,7 @@ function [labels index]= find_labels_of_activations...
 % a             : annotations
 % imglist       : list of images
 % detections    : struct of N activations of poselets
-% kps_models    : keypoint model for poselets
-% target_kps    : index of keypoints to be considered for labeling
-%               activations
+% kps_models    : bbox model for poselets
 % iou_thresh    : threshold for IOU
 %% OUTPUT
 % labels        : Nx1 vector of true/false
@@ -34,7 +32,9 @@ pred_bounds = nan(N,4);
 
 fprintf('Doing kid ');
 for kid=1:Nkpids
-    fprintf('[%d]',kid);
+	if(rem(kid,10)==0)
+    	fprintf('[%d]',kid);
+	end
     % activations of kid
     keep = detections.kpids==kid;   
     boxes = detections.boxes(keep,:);

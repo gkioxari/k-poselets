@@ -68,15 +68,14 @@ for imid=imids
     if N==0, continue; end
 
     fprintf('Imid %d\n',imid);
-    fprintf('...Getting torso bounds\n');
-    torso_bounds = pred_bounds(keep,:);
+    %torso bounds
+	torso_bounds = pred_bounds(keep,:);
     scores = pred_scores(keep);
     
-    
-    fprintf('...Computing IOU\n');
+    %I-over-U
     iou = inters_union(torso_bounds,torso_bounds);
     
-    fprintf('...Agglomerative Clustering\n');
+	%agglomerative clustering
     Z=leaderlinkage(1-iou, scores);
     if ~isempty(Z)
     	T = cluster(Z,'cutoff',1-thresh,'criterion','distance');

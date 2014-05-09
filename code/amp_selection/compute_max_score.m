@@ -12,7 +12,9 @@ end
 max_score = -inf(Nannots,Nkpids);
 fprintf('Doing annot ');
 for i=first_el:last_el
-    fprintf('[%d]',i);
+	if(rem(i-1,10)==0)
+    	fprintf('[%d]',i);
+	end
     keep = index==i;
     m = accumarray(detections.kpids(keep), double(detections.scores(keep)), [Nkpids 1], @max, -inf);
     max_score(i,:) = m';   

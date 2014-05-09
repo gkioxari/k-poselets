@@ -25,7 +25,6 @@ fringe=[1:numel(scores)];
 Z=[];
 
 
-numel(scores)
 curr_min=0;
 tmp=false(numel(scores),1);
 while(numel(fringe)>1)
