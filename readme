@@ -47,4 +47,57 @@
 
 (2) coords = predict_keypoints(box, kps_model)
 
+(3) bbox_models=bbox_klet(annot,part)
+
+
+
+--------------------------------------------------------------------------------------------
+								DETECTING K-POSELETS
+--------------------------------------------------------------------------------------------
+(1) detections = collect_detections_on_imglist(imglist, models, 3, start_id, end_id, use_sse);
+	where start_id is the starting index and end_id is the ending index in imglist
+
+
+
+--------------------------------------------------------------------------------------------
+								AMP SELECTION
+--------------------------------------------------------------------------------------------
+After computing detections on val:
+(1) Find labels of activations
+Using torsos:
+[labels, index] = find_labels_of_activations(annot, imglist, detections, kps_models, [1 4 7 10], 0.5);
+Using bounding boxes:
+[labels, index] = find_labels_of_activations_bbox(annot, imglist, detections, bbox_models, 0.5);
+
+(2) Get precision-recall mapping
+prec_rec = precision_recall_for_klets(detections, labels);
+Use torsos to get torso_prec_rec, bounding boxes to get bbox_prec_rec;
+
+(3) AMP selection
+max_score=compute_max_score(detections, index);
+[C, amp] = amp_selection(max_score, prec_rec, 200);
+
+(4) Select detections
+detections=select_detections(detections, ismember(detections.kpids, C));
+
+
+--------------------------------------------------------------------------------------------
+								CLUSTERING
+--------------------------------------------------------------------------------------------
+(1) clusters = cluster_activations_agglomerative(detections, kps_models, torso_prec_rec, [1 4 7 10], 0.3);
+
+
+
+--------------------------------------------------------------------------------------------
+								STAGE 2 MODELS
+--------------------------------------------------------------------------------------------
+(1) Train stage 2 models:
+stage2model = train_stage2_detection_top_withbbox(training_image_ids, clusters, detections,...
+							 kps_models, torso_prec_rec, bbox_prec_rec, imglist, annot, bbox_models, C);
+
+(2) Test stage 2 models:
+[scores, bounds, idx]=test_stage2_detection_top(clusters, detections, kps_models, ...
+							torso_prec_rec, bbox_prec_rec, imglist, bbox_models, ...
+							C, stage2model);
+
 

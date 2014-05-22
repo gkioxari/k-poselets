@@ -1,7 +1,9 @@
-function detections = detect_kposelets_all(img, models, maxnumparts)
+function detections = detect_kposelets_all(img, models, maxnumparts, use_sse)
 %function detections = detect_kposelets_all(img, models, maxnumparts)
 %detects kposelets in img
-
+if(~exist('use_sse', 'var'))
+	use_sse=true;
+end
 
 %get maximum template size	
 maxmodel=models(1);
@@ -25,7 +27,7 @@ for k=1:numel(models)
 	if(rem(k-1,100)==0) disp(k); end
 
 	%detect
-	[boxes1 resp]=run_kposelet_tree_dt(pyr, img2f, f2img, model, model.thresh-1);
+	[boxes1 resp]=run_kposelet_tree_dt(pyr, img2f, f2img, model, model.thresh-1, use_sse);
 	if(isempty(boxes1))
 		continue;
 	end
