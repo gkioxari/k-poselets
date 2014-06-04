@@ -1,6 +1,6 @@
-rootdir='../../data/tmp';
+rootdir='../data';
 imglist.id='000058';
-imglist.im=fullfile(rootdir,'final', '000058.jpg');
+imglist.im=fullfile(rootdir,'000058.jpg');
 img=imread(imglist.im);
 imglist.dims=[size(img,2) size(img,1)];
 load(fullfile(rootdir, 'kposelet_models.mat'));
