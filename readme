@@ -111,5 +111,7 @@ apk_pred = kposelet_apk_prediction(annot,imglist,detections,
                                                           clusters,kps_prec_rec,kps_models);
 
 --------------------------------------------------------------------------------------------
-EVALUATION
+KEYPOINT EVALUATION
 --------------------------------------------------------------------------------------------
+(1) Evaluation of APK
+compute_kp_APK(annot,apk_pred,alpha);
