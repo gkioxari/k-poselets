@@ -1,6 +1,6 @@
 function prec_rec = pck_prec_rec(a,imglist,detections,kps_models,alpha)
 %% PCK_PREC_REC() computes the precision recall mapping from the activations
-%% based on the pck metric
+%% based on the pck metric (alpha * torso_height)
 %% INPUT
 % a         : annotations
 % imglist   : list of images
@@ -31,7 +31,6 @@ for j = 1:length(kpids)
     kid = kpids(j);
     fprintf('[%d] ',kid);
     
-
     keep  = find(detections.kpids==kid);
     boxes = detections.boxes(keep,:);
     coords = predict_keypoints(boxes,kps_models(kid));
