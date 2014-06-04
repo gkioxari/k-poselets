@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
-			               DATA INITIALIZATION
+DATA INITIALIZATION
 ------------------------------------------------------------------------------------------
 
 (1)  Set up the list of images
@@ -13,7 +13,7 @@
        	      annot_path: the path to the directory containing the annotations
 
 ------------------------------------------------------------------------------------------
-		                CONSTRUCTION OF POSLISTS
+CONSTRUCTION OF POSLISTS
 ------------------------------------------------------------------------------------------
 
 (1) part=sample_kposelets(annot,imglist,unit_dims,K,NUM_CANDIDATES);
@@ -26,7 +26,7 @@
 
 
 ------------------------------------------------------------------------------------------
-                                  TRAINING EACH POSELET
+ TRAINING EACH POSELET
 ------------------------------------------------------------------------------------------
 
 (1) model = train_kposelet(part, annot, negimglist, imglist, name, kpid, index_in_part);
@@ -39,7 +39,7 @@
     index_in_part is the index in part of the kposelet you want to train.
 
 --------------------------------------------------------------------------------------------
-                                  KEYPOINT MODELS
+KEYPOINT MODELS
 --------------------------------------------------------------------------------------------
 
 (1)  kps_models = keypoint_klet(annot,part)
@@ -52,7 +52,7 @@
 
 
 --------------------------------------------------------------------------------------------
-			       DETECTING K-POSELETS
+DETECTING K-POSELETS
 --------------------------------------------------------------------------------------------
 (1) detections = collect_detections_on_imglist(imglist, models, 3, start_id, end_id, use_sse);
 	where start_id is the starting index and end_id is the ending index in imglist
@@ -60,7 +60,7 @@
 
 
 --------------------------------------------------------------------------------------------
-					AMP SELECTION
+AMP SELECTION
 --------------------------------------------------------------------------------------------
 After computing detections on val:
 (1) Find labels of activations
@@ -82,14 +82,14 @@ detections=select_detections(detections, ismember(detections.kpids, C));
 
 
 --------------------------------------------------------------------------------------------
-				                CLUSTERING
+CLUSTERING
 --------------------------------------------------------------------------------------------
 (1) clusters = cluster_activations_agglomerative(detections, kps_models, torso_prec_rec, [1 4 7 10], 0.3);
 
 
 
 --------------------------------------------------------------------------------------------
-					STAGE 2 MODELS
+STAGE 2 MODELS
 --------------------------------------------------------------------------------------------
 (1) Train stage 2 models:
 stage2model = train_stage2_detection_top_withbbox(training_image_ids, clusters, detections,...
@@ -101,7 +101,7 @@ stage2model = train_stage2_detection_top_withbbox(training_image_ids, clusters, 
 							C, stage2model);
 
 --------------------------------------------------------------------------------------------
-                                  KEYPOINT PREDICTIONS
+KEYPOINT PREDICTIONS
 --------------------------------------------------------------------------------------------
 (1) Precision-recall mapping based on keypoint predictions
 kps_prec_rec = pck_prec_rec(annot,imglist,detections,kps_models,alpha) ;
@@ -110,6 +110,6 @@ kps_prec_rec = pck_prec_rec(annot,imglist,detections,kps_models,alpha) ;
 apk_pred = kposelet_apk_prediction(annot,imglist,detections,
                                                           clusters,kps_prec_rec,kps_models);
 
-  --------------------------------------------------------------------------------------------
-                                                  EVALUATION
+--------------------------------------------------------------------------------------------
+EVALUATION
 --------------------------------------------------------------------------------------------

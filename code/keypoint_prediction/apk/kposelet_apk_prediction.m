@@ -16,7 +16,7 @@ function apk_pred = kposelet_apk_prediction(a,imglist,detections,clusters,kps_pr
 a = select_annotations(a,~a.img_flipped);
 Kp = length(a.kps_labels);
 
-% note: for pose estimation we evaluate only on the images that contain 
+% note: for pose estimation we evaluate only the images that contain 
 % annotations.
 image_names = unique(a.img_name); 
 
