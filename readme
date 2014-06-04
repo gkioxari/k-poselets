@@ -104,14 +104,13 @@ stage2model = train_stage2_detection_top_withbbox(training_image_ids, clusters, 
 KEYPOINT PREDICTIONS
 -------------------------------------------------------------------------------------------
 (1) Precision-recall mapping based on keypoint predictions
-kps_prec_rec = pck_prec_rec(annot,imglist,detections,kps_models,alpha) ;
+kps_prec_rec = kps_prec_rec(annot,imglist,detections,kps_models,alpha) ;
 
-(2) APK prediction: Each cluster makes a prediction for each keypoint and a score
-apk_pred = kposelet_apk_prediction(annot,imglist,detections,
-                                                          clusters,kps_prec_rec,kps_models);
+(2) Keypoint prediction: Each cluster makes a prediction for each keypoint and a score
+kp_pred = kposelet_keypoint_prediction(     imglist,detections,clusters,kps_prec_rec,kps_models)
 
 -------------------------------------------------------------------------------------------
 KEYPOINT EVALUATION
 -------------------------------------------------------------------------------------------
 (1) Evaluation of APK
-compute_kp_APK(annot,apk_pred,alpha);
+compute_kp_APK(annot,kp_pred,alpha);
